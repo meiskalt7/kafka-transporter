@@ -1,0 +1,39 @@
+<?xml version = "1.0" encoding = "UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <include resource="org/springframework/boot/logging/logback/base.xml" />
+
+    <logger name="sun" level="warn" />
+    <logger name="org.xnio" level="warn" />
+    <logger name="org.apache" level="warn" />
+    <logger name="com.netflix" level="warn" />
+    <logger name="com.sun.jersey" level="warn" />
+    <logger name="org.springframework" level="info" />
+    <logger name="org.postgresql" level="warn" />
+    <logger name="org.hibernate" level="info" />
+    <logger name="com.fasterxml.jackson" level="info" />
+    <logger name="org.apache.kafka.clients.consumer" level="error" />
+
+    <springProfile name="dev">
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%-5level %logger{35} - %msg %n</pattern>
+            </encoder>
+        </appender>
+        <root level="debug">
+            <appender-ref ref="STDOUT" />
+        </root>
+    </springProfile>
+
+    <springProfile name="prod,default">
+        <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%-5level %logger{35} - %msg %n</pattern>
+            </encoder>
+        </appender>
+        <root level="info">
+            <appender-ref ref="STDOUT"/>
+        </root>
+    </springProfile>
+
+</configuration>

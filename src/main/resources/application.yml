@@ -1,0 +1,113 @@
+app:
+  send-timeout: ${send-timeout}
+  types-set: note
+
+info:
+  version: 1.0
+  description: Data kafka transporter
+
+server:
+  port: ${spring.application.port:8091}
+  context-path:
+
+management:
+  port: ${server.port}
+  security.enabled: false
+  context-path: /manage
+
+encrypt:
+  failOnError: false
+
+health:
+  config:
+    enabled: false
+
+spring:
+  cloud:
+    stream:
+      bindings:
+        input:
+          destination: ${kafka.destination.input:InputTopic}
+          group: kafka-transporter-1
+          binder: kafkaInputBinder
+          consumer:
+            autoRebalanceEnable: true
+            autoCommitOffset: false
+            concurrency: 5
+            partitioned: true
+            resetOffsets: true
+            startOffset: earliest
+            headerMode: raw
+        output:
+          destination: ${kafka.destination.output:OutputTopic}
+          binder: kafkaOutputBinder
+          producer:
+            sync: true
+            headerMode: raw
+      binders:
+        kafkaInputBinder:
+          type: kafka
+          environment:
+            spring:
+              cloud:
+                stream:
+                  kafka:
+                    binder:
+                      brokers: ${kafka.binder.brokersIn:localhost}
+                      defaultBrokerPort: ${kafka.binder.defaultBrokerPortIn:9092}
+                      zkNodes: ${kafka.binder.zkNodesIn:localhost}
+                      defaultZkPort: ${kafka.binder.defaultZkPortIn:2181}
+        kafkaOutputBinder:
+          type: kafka
+          environment:
+            spring:
+              cloud:
+                stream:
+                  kafka:
+                    binder:
+                      brokers: ${kafka.binder.brokersOut:localhost}
+                      defaultBrokerPort: ${kafka.binder.defaultBrokerPortOut:9092}
+                      zkNodes: ${kafka.binder.zkNodesOut:localhost}
+                      defaultZkPort: ${kafka.binder.defaultZkPortOut:2181}
+                      configuration:
+                        max.request.size: 2255775
+      default-binder: kafkaInputBinder
+  main:
+    banner-mode: 'off'
+  kafka:
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.ByteArraySerializer
+
+eureka:
+  client:
+    enabled: true
+    registerWithEureka: true
+    fetchRegistry: true
+    healthcheck:
+      enabled: true
+    serviceUrl:
+      defaultZone: http://${discovery.host:localhost}:${discovery.port:8761}/eureka/
+    availabilityZones:
+      default: defaultZone
+  instance:
+    hostname: ${spring.application.name:kafka-transporter}
+    prefer-ip-address: false
+    leaseRenewalIntervalInSeconds: 30
+    leaseExpirationDurationInSeconds: 60
+    metadata-map:
+      instanceId: ${spring.application.name:kafka-transporter}:${random.value}
+      management.context-path: ${server.context-path}${management.context-path}
+    statusPageUrlPath: ${server.context-path}${management.context-path}/info
+    healthCheckUrlPath: ${server.context-path}${management.context-path}/health
+    homePageUrlPath: ${eureka.hostname}/
+
+endpoints:
+  bus:
+    enabled: true
+  jmx:
+    enabled: false
+  liquibase:
+    enabled: false
+  jolokia:
+    enabled: false

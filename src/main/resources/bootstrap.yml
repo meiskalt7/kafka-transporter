@@ -1,0 +1,46 @@
+send-timeout: ${send_timeout}
+
+discovery:
+  host: ${discovery_host}
+  port: ${discovery_port}
+
+config:
+  host: ${config_host}
+  port: ${config_port}
+
+kafka:
+  destination:
+    input: ${kafka_destination_input}
+    output: ${kafka_destination_output}
+  binder:
+    brokersIn: ${kafka_binder_brokers_in}
+    defaultBrokerPortIn: ${kafka_binder_default_broker_port_in}
+    zkNodesIn: ${kafka_zk_nodes_in}
+    defaultZkPortIn: ${kafka_zk_port_in}
+    brokersOut: ${kafka_binder_broker_out}
+    defaultBrokerPortOut: ${kafka_binder_default_broker_port_out}
+    zkNodesOut: ${kafka_zk_nodes_out}
+    defaultZkPortOut: ${kafka_zk_port_out}
+spring:
+  application:
+    name: kafka-transporter
+    port: ${application_port}
+    index: ${random.int}
+  profiles:
+    active: default
+  cloud:
+    inetutils:
+      preferred-networks:
+        - 10.0
+      ignored-interfaces:
+        - eth2
+        - eth2@*
+    config:
+      enabled: false
+      uri: http://${config.host:config-service.local}:${config.port:8888}
+      failFast: true
+      overrideSystemProperties: true
+      overrideNone: false
+      discovery:
+        enabled: false
+        service-id: config-server
