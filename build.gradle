@@ -1,0 +1,95 @@
+buildscript {
+    ext {
+        springBootVersion = '1.5.10.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}",
+                "io.spring.gradle:dependency-management-plugin:1.0.4.RELEASE"
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+springBoot {
+    mainClass = "org.meiskalt7.kafka.transporter.ServiceApplication"
+}
+
+group = 'org.meiskalt7'
+version = '1.0-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    ver = [
+            springBoot        : '1.5.10.RELEASE',
+            springCloud       : 'Edgware.RELEASE',
+
+            javaxValidation   : '2.0.1.Final',
+            hibernateValidator: '6.0.13.Final',
+
+            junitJupiter      : '5.3.1',
+
+            lombok            : '1.18.2'
+    ]
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:$ver.springBoot"
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:$ver.springCloud"
+    }
+
+    dependencies {
+        dependency "org.springframework.boot:spring-boot-starter-parent:$ver.springBoot"
+
+        dependency "org.projectlombok:lombok:$ver.lombok"
+
+        dependency "org.hibernate:hibernate-validator:$ver.hibernateValidator"
+        dependency "javax.validation:validation-api:$ver.javaxValidation"
+
+        dependency "org.junit.vintage:junit-vintage-engine:$ver.junitJupiter"
+
+        // JUnit5
+        dependencySet(group: 'org.junit.jupiter', version: ver.junitJupiter) {
+            entry 'junit-jupiter-api'
+            entry 'junit-jupiter-engine'
+            entry 'junit-jupiter-params'
+            entry 'junit-jupiter-migrationsupport'
+        }
+
+    }
+}
+
+dependencies {
+
+    compile "org.springframework.boot:spring-boot-starter-undertow",
+            "org.springframework.boot:spring-boot-starter-parent",
+            "org.springframework.cloud:spring-cloud-starter-hystrix",
+            "org.springframework.cloud:spring-cloud-starter-eureka",
+            "org.springframework.cloud:spring-cloud-starter-config",
+            "org.springframework.cloud:spring-cloud-starter-stream-kafka",
+            "org.springframework.cloud:spring-cloud-starter-bus-amqp",
+            "org.springframework.cloud:spring-cloud-stream",
+            "javax.validation:validation-api",
+            "ch.qos.logback:logback-classic"
+
+    compileOnly "org.springframework.boot:spring-boot-configuration-processor",
+            "org.projectlombok:lombok"
+
+    testCompile "org.springframework.boot:spring-boot-starter-test",
+            "org.springframework.cloud:spring-cloud-stream-test-support",
+            "org.junit.jupiter:junit-jupiter-api",
+            "org.junit.jupiter:junit-jupiter-params",
+            "org.junit.vintage:junit-vintage-engine"
+
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine"
+}
