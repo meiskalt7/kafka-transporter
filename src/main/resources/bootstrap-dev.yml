@@ -1,0 +1,41 @@
+send-timeout: 10000
+
+discovery:
+  host: localhost
+  port: 8761
+
+config:
+  host: localhost
+  port: 8008
+
+kafka:
+  destination:
+    input: InputTopic
+    output: OutputTopic
+  binder:
+    brokersIn: localhost
+    defaultBrokerPortIn: 9092
+    zkNodesIn: localhost
+    defaultZkPortIn: 2181
+    brokersOut: localhost
+    defaultBrokerPortOut: 9092
+    zkNodesOut: localhost
+    defaultZkPortOut: 2181
+
+spring:
+  application:
+    name: kafka-transporter
+    port: 8091
+    index: ${random.int}
+  profiles:
+    active: dev
+  cloud:
+    config:
+      enabled: false
+      uri: http://${config.host:config-service.local}:${config.port:8008}
+      failFast: true
+      overrideSystemProperties: true
+      overrideNone: false
+      discovery:
+        enabled: false
+        service-id: config-server
